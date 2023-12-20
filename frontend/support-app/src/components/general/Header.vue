@@ -5,10 +5,8 @@
 <template>
 
 
-    <img alt="" src="@/assets/logo.svg"/>
-
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <img src="/assets/images/logo.png" alt="">
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
@@ -21,7 +19,4 @@
 
 <style scoped>
 
-header {
-    background-color: white;
-}
 </style>
