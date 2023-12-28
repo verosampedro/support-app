@@ -1,29 +1,53 @@
 <script setup>
+import { ref } from 'vue';
 
+const usuario = ref('');
+const contraseña = ref('');
+const recordarContraseña = ref(false);
+
+const enviarFormulario = async () => {
+  try {
+    const response = await fetch('http://localhost:8080/api/usuarios/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ usuario: usuario.value, contraseña: contraseña.value }),
+    });
+
+    if (response.ok) {
+      console.log('Inicio de sesión completado');
+    
+    } else {
+      const errorMessage = await response.text(); 
+      console.error('Credenciales inválidas:', errorMessage);
+    }
+  } catch (error) {
+    console.error('Error de red:', error);
+  }
+};
 </script>
 
 <template>
-
-    <form class="loginForm">
+  <form class="loginForm" @submit.prevent="enviarFormulario">
 
     <h1>LOGIN</h1>
 
-      <label for="usuario">Usuario:</label>
-      <input type="text" id="usuario" name="usuario" v-model="usuario" required>
-  
-      <label for="contraseña">Contraseña:</label>
-      <input type="password" id="contraseña" name="contraseña" v-model="contraseña" required>
-  
-      <div class="rememberPassword">
-        <input type="checkbox" id="recordar" name="recordar" v-model="recordarContraseña">
-        <label for="recordar">Recordar contraseña</label>
-      </div>
-  
-      <button type="button" @click="enviarFormulario">ENTRAR</button>
+    <label for="usuario">Usuario:</label>
+    <input type="text" id="usuario" name="usuario" v-model="usuario" required>
 
-    </form>
+    <label for="contraseña">Contraseña:</label>
+    <input type="password" id="contraseña" name="contraseña" v-model="contraseña" required>
 
-  </template>
+    <div class="rememberPassword">
+      <input type="checkbox" id="recordar" name="recordar" v-model="recordarContraseña">
+      <label for="recordar">Recordar contraseña</label>
+    </div>
+
+    <button type="submit">ENTRAR</button>
+
+  </form>
+</template>
   
   <style lang="scss" scoped>
 
