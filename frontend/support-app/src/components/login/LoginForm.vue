@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const usuario = ref('');
 const contraseña = ref('');
 const recordarContraseña = ref(false);
+const router = useRouter();
 
 const enviarFormulario = async () => {
   try {
@@ -17,10 +19,13 @@ const enviarFormulario = async () => {
 
     if (response.ok) {
       console.log('Inicio de sesión completado');
-    
+      
+      router.push('/about');
     } else {
-      const errorMessage = await response.text(); 
+      const errorMessage = await response.text();
       console.error('Credenciales inválidas:', errorMessage);
+      
+      alert('Credenciales incorrectas');
     }
   } catch (error) {
     console.error('Error de red:', error);
