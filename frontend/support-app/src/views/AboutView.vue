@@ -1,6 +1,10 @@
+<script setup>
+import Requests from '@/components/requests/Requests.vue';
+</script>
+
 <template>
   <main>
-    <p>This is an about page</p>
+    <Requests />
   </main>
 </template>
 
