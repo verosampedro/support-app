@@ -1,59 +1,110 @@
 <script setup>
+import { ref, onMounted, watch } from 'vue';
 
-import { ref } from 'vue';
+const apiUrl = 'http://localhost:8080';
 
-  const isPopupVisible = ref(false);
-  const isDetailPopupVisible = ref(false);
-  const applicantName = ref('');
-  const requestDate = ref('');
-  const requestTopic = ref('');
-  const requestDescription = ref('');
-  const selectedRequest = ref(null);
-  const requests = ref([]);
+const isPopupVisible = ref(false);
+const isDetailPopupVisible = ref(false);
+const applicantName = ref('');
+const requestDate = ref('');
+const requestTopic = ref('');
+const requestDescription = ref('');
+const selectedRequest = ref(null);
+const requests = ref([]);
 
-  const openPopup = () => {
-    isPopupVisible.value = true;
-  };
+onMounted(() => {
+  loadRequestsFromLocalStorage();
+});
 
-  const closePopup = () => {
-    isPopupVisible.value = false;
-  };
+watch(requests, () => {
+  saveRequestsToLocalStorage();
+});
 
-  const submitRequest = () => {
-    if (applicantName.value && requestDate.value && requestTopic.value && requestDescription.value) {
-      const newRequest = {
-        name: applicantName.value,
-        date: requestDate.value,
-        topic: requestTopic.value,
-        description: requestDescription.value,
-      };
-      requests.value.push(newRequest);
+const openPopup = () => {
+  isPopupVisible.value = true;
+};
+
+const closePopup = () => {
+  isPopupVisible.value = false;
+};
+
+const submitRequest = async () => {
+  if (applicantName.value && requestDate.value && requestTopic.value && requestDescription.value) {
+    const newRequest = {
+      name: applicantName.value,
+      date: requestDate.value,
+      topic: requestTopic.value,
+      description: requestDescription.value,
+    };
+
+    try {
+      const response = await fetch(`${apiUrl}/api/solicitudes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newRequest),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al enviar la solicitud al servidor. Código: ${response.status}`);
+      }
+
+      const data = await response.json();
+      requests.value.push(data);
 
       applicantName.value = '';
       requestDate.value = '';
       requestTopic.value = '';
       requestDescription.value = '';
       closePopup();
-    } else {
-      alert('Por favor, complete todos los campos del formulario.');
+    } catch (error) {
+      console.error('Error al enviar la solicitud al servidor:', error);
+      alert('Hubo un error al enviar la solicitud.');
     }
-  };
+  } else {
+    alert('Por favor, complete todos los campos del formulario.');
+  }
 
-  const deleteRequest = (index) => {
-    requests.value.splice(index, 1);
-  };
+  saveRequestsToLocalStorage();
 
-  const openDetailPopup = (request) => {
-    selectedRequest.value = request;
-    isDetailPopupVisible.value = true;
-  };
+};
 
-  const closeDetailPopup = () => {
-    selectedRequest.value = null;
-    isDetailPopupVisible.value = false;
-  };
+const loadRequestsFromLocalStorage = () => {
+  const storedRequests = localStorage.getItem('requests');
+  if (storedRequests) {
+    requests.value = JSON.parse(storedRequests);
+  }
+};
+
+const saveRequestsToLocalStorage = () => {
+  localStorage.setItem('requests', JSON.stringify(requests.value));
+};
+
+const deleteRequest = (request) => {
+  const indexToDelete = requests.value.findIndex(req => req.id === request.id);
+  
+  if (indexToDelete !== -1) {
+    requests.value.splice(indexToDelete, 1);
+    console.log(`Solicitud eliminada: ${request.topic}`);
+  }
+
+  saveRequestsToLocalStorage();
+
+};
+
+const openDetailPopup = (request) => {
+  selectedRequest.value = request;
+  isDetailPopupVisible.value = true;
+};
+
+const closeDetailPopup = () => {
+  selectedRequest.value = null;
+  isDetailPopupVisible.value = false;
+};
 
 </script>
+
 
 <template>
 
@@ -73,14 +124,15 @@ import { ref } from 'vue';
       </div>
 
       <div id="activeRequests">
-        <div v-for="(request, index) in requests" :key="index" :class="'request' + (index % 2 + 1)">
-          <p>Solicitud: {{ request.topic }}</p>
-          <div class="icons">
-            <img @click.prevent="deleteRequest(index)" src="/assets/images/trash.png" alt="">
-            <img @click.prevent="openDetailPopup(request)" src="/assets/images/see.png" alt="">
-          </div>
+      <div v-for="request in requests" :key="request.id" :class="'request' + (request.id % 2 + 1)">
+        <p>Solicitud: {{ request.topic }}</p>
+        <div class="icons">
+          <img @click.prevent="deleteRequest(request)" src="/assets/images/trash.png" alt="">
+          <img @click.prevent="openDetailPopup(request)" src="/assets/images/see.png" alt="">
         </div>
       </div>
+    </div>
+
     </div>
 
     <div v-if="isPopupVisible" class="popupOverlay">
@@ -101,7 +153,8 @@ import { ref } from 'vue';
           <label for="requestDescription">DESCRIPCIÓN</label>
           <textarea v-model="requestDescription" required></textarea>
 
-          <button type="submit">ENVIAR SOLICITUD</button>
+          <button type="submit" @click.prevent="submitRequest">ENVIAR SOLICITUD</button>
+
         </form>
 
       </div>
