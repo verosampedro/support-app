@@ -61,10 +61,12 @@ const enviarFormulario = async () => {
   .loginForm {
     background-color: white;
     max-width: 300px;
-    margin: 20px auto;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    margin-top: 15rem;
+    margin-left: 3.7rem;
 
     font-family: 'League Spartan', sans-serif;
 
@@ -113,6 +115,12 @@ const enviarFormulario = async () => {
     cursor: pointer;
 
     margin-left: 90px;
+  }
+
+  @media only screen and (min-width: 768px) {
+    .loginForm {
+      margin-left: 50rem;
+    }
   }
   
   </style>

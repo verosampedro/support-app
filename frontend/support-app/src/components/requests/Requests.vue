@@ -103,6 +103,14 @@ const closeDetailPopup = () => {
   isDetailPopupVisible.value = false;
 };
 
+const clearFormFields = () => {
+  applicantName.value = '';
+  requestDate.value = '';
+  requestTopic.value = '';
+  requestDescription.value = '';
+};
+
+
 </script>
 
 
@@ -153,7 +161,8 @@ const closeDetailPopup = () => {
           <label for="requestDescription">DESCRIPCIÓN</label>
           <textarea v-model="requestDescription" required></textarea>
 
-          <button type="submit" @click.prevent="submitRequest">ENVIAR SOLICITUD</button>
+          <button type="submit">ENVIAR SOLICITUD</button>
+          <button type="button" @click.prevent="clearFormFields">RESETEAR</button>
 
         </form>
 
