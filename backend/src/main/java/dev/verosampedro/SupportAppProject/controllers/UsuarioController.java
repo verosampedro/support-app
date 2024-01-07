@@ -25,16 +25,3 @@ public class UsuarioController {
         }
     }
 }
-
-    /* @PostMapping("/registro")
-    public String registrarUsuario(@RequestBody Usuario usuario) {
-        
-        if (usuarioRepository.findByUsuario(usuario.getUsuario()) != null) {
-            return "El usuario ya existe";
-        }
-
-        
-        usuarioRepository.save(usuario);
-
-        return "Usuario registrado con éxito";
-    } */
